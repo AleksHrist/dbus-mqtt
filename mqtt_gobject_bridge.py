@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import errno
-import gobject
 import logging
 import os
 import paho.mqtt.client
@@ -13,6 +12,7 @@ import traceback
 
 AppDir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(AppDir, 'ext', 'velib_python'))
+from gobjectwrapper import gobject
 from ve_utils import exit_on_error
 
 
@@ -43,7 +43,7 @@ class MqttGObjectBridge(object):
 				self._client.connect(self._mqtt_server, 8883, 60)
 			self._init_socket_handlers()
 			return False
-		except socket.error, e:
+		except socket.error as e:
 			if e.errno == errno.ECONNREFUSED:
 				return True
 			raise
@@ -87,7 +87,7 @@ class MqttGObjectBridge(object):
 			self._init_socket_handlers()
 			logging.info('[Reconnect] success')
 			return False
-		except socket.error, e:
+		except socket.error as e:
 			logging.error('[Reconnect] failed' + traceback.format_exc())
 			if e.errno == errno.ECONNREFUSED:
 				return True

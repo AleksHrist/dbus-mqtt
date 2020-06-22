@@ -3,13 +3,13 @@
 import argparse
 import dbus
 import json
-import gobject
 import logging
 import os
 import sys
 from time import time
 import traceback
 import signal
+import six
 from dbus.mainloop.glib import DBusGMainLoop
 from lxml import etree
 from collections import OrderedDict
@@ -18,6 +18,7 @@ from collections import OrderedDict
 # Victron packages
 AppDir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(AppDir, 'ext', 'velib_python'))
+from gobjectwrapper import gobject
 from logger import setup_logging
 from ve_utils import get_vrm_portal_id, exit_on_error, wrap_dbus_value, unwrap_dbus_value
 from mqtt_gobject_bridge import MqttGObjectBridge
@@ -93,9 +94,7 @@ class DbusMqtt(MqttGObjectBridge):
 		self.queue[topic] = payload
 
 	def _publish_all(self, reset=False):
-		keys = self._values.keys()
-		keys.sort()
-		for topic in keys:
+		for topic in sorted(self._values.keys()):
 			value = self._values[topic]
 			self._publish(topic, value, reset=reset)
 
@@ -214,7 +213,7 @@ class DbusMqtt(MqttGObjectBridge):
 					raise
 			for path, value in items.items():
 				self._add_item(service, device_instance, path, value=unwrap_dbus_value(value), publish=publish, get_value=False)
-		except dbus.exceptions.DBusException, e:
+		except dbus.exceptions.DBusException as e:
 			if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown' or \
 				e.get_dbus_name() == 'org.freedesktop.DBus.Error.Disconnected':
 				logging.info("[Scanning] Service disappeared while being scanned: %s", service)
@@ -273,7 +272,7 @@ class DbusMqtt(MqttGObjectBridge):
 
 	def _service_queue(self, items=5):
 		self._last_queue_run = time()
-		for _ in xrange(items):
+		for _ in six.moves.range(items):
 			try:
 				topic, value = self.queue.popitem(last=False)
 			except KeyError:
