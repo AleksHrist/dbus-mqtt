@@ -8,6 +8,7 @@ FILES = \
 	$(SRC_DIR)/mqtt_gobject_bridge.py
 
 VEDLIB_FILES = \
+	$(SRC_VEDLIB_DIR)/gobjectwrapper.py \
 	$(SRC_VEDLIB_DIR)/logger.py \
 	$(SRC_VEDLIB_DIR)/mosquitto_bridge_registrator.py \
 	$(SRC_VEDLIB_DIR)/ve_utils.py \
